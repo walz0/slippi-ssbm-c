@@ -12,6 +12,17 @@ typedef struct GUI_GameSetup {
   void **fog;
 } GUI_GameSetup;
 
+typedef struct GUI_RstScreen {
+  JOBJSet **jobjs;
+  COBJDesc **cobjs;
+  void **lights;
+  void **fog;
+} GUI_RstScreen;
+
+typedef struct TestChar {
+  JOBJSet **jobjs;
+} TestChar;
+
 typedef enum GUI_GameSetup_JOBJ {
   GUI_GameSetup_JOBJ_Background,
   GUI_GameSetup_JOBJ_Panels,
@@ -27,5 +38,18 @@ typedef enum GUI_GameSetup_JOBJ {
   GUI_GameSetup_JOBJ_TurnIndicator,
   GUI_GameSetup_JOBJ_GameResult,
 } GUI_GameSetup_JOBJ;
+
+typedef enum GUI_RstScreen_JOBJ {
+  GUI_RstScreen_JOBJ_CSIcon,
+  GUI_RstScreen_JOBJ_FlatTexture,
+  GUI_RstScreen_JOBJ_StockIcon,
+  GUI_RstScreen_JOBJ_GameResult,
+} GUI_RstScreen_JOBJ;
+
+typedef enum TestChar_JOBJ {
+  CHAR_JOBJ
+} TestChar_JOBJ;
+
+
 
 #endif
