@@ -41,9 +41,11 @@ typedef enum GUI_GameSetup_JOBJ {
 
 typedef enum GUI_RstScreen_JOBJ {
   GUI_RstScreen_JOBJ_CSIcon,
-  GUI_RstScreen_JOBJ_FlatTexture,
+  GUI_RstScreen_JOBJ_CharNames,
   GUI_RstScreen_JOBJ_StockIcon,
   GUI_RstScreen_JOBJ_GameResult,
+  GUI_RstScreen_JOBJ_Thumbnails,
+  GUI_RstScreen_JOBJ_Winner,
 } GUI_RstScreen_JOBJ;
 
 typedef enum TestChar_JOBJ {

@@ -12,19 +12,146 @@
 #pragma pack(1)
 typedef struct RstScreen_SceneData {
   u8 max_games;
-  u16 cur_game;
   u8 score_by_player[2];
-  u8 prev_winner;
   u8 tiebreak_game_num;
   u8 game_results[9];
   u16 last_stage_win_by_player[2];
-  u8 color_ban_active;
-  u8 color_ban_char;
-  u8 color_ban_color;
-  u8 last_game_end_mode;
   u8 (*get_winner_idx)();
 } RstScreen_SceneData;
 #pragma pack()
+
+int (*GetCharacterVictoryTheme)(CharacterKind kind) = (int *) 0x80160400;
+int (*SFX_PlayVolPitch)(int sfx, int volume, int pitch) = (int *) 0x800237a8;
+JOBJ* (*VictoryScreen_GetWinnerLogoJObj)(JOBJ *jobj, CharacterKind ckind, int is_quit_out) = (JOBJ *)0x80176bf0;
+void* (*VictoryScreen_CreateWinnerLogo)(void) = (void *) 0x80176f60;
+
+// SFX
+int NARRATOR_WINNER_IS = 0xC355;
+
+int currentSFX = 0x7530;
+
+int debugText;
+char* debugString[20];
+Text *text;
+
+typedef struct CharThumbnail {
+  FighterKind kind;
+  int dir;
+} CharThumbnail;
+
+static CharThumbnail THUMBNAILS[33] = {
+  {FTKIND_MARIO, -1},
+  {FTKIND_FOX, 1},
+  {FTKIND_FALCON, -1},
+  {FTKIND_DK, -1},
+  {FTKIND_KIRBY, 1},
+  {FTKIND_BOWSER, -1},
+  {FTKIND_LINK, 1},
+  {FTKIND_SHEIK, -1},
+  {FTKIND_NESS, 1},
+  {FTKIND_PEACH, -1},
+  {FTKIND_POPO, -1},
+  {FTKIND_NANA, 0},
+  {FTKIND_PIKACHU, -1},
+  {FTKIND_SAMUS, -1},
+  {FTKIND_YOSHI, -1},
+  {FTKIND_JIGGLYPUFF, 1},
+  {FTKIND_MEWTWO, -1},
+  {FTKIND_LUIGI, 1},
+  {FTKIND_MARTH, 1},
+  {FTKIND_ZELDA, -1},
+  {FTKIND_YOUNGLINK, -1},
+  {FTKIND_DRMARIO, 1},
+  {FTKIND_FALCO, 1},
+  {FTKIND_PICHU, 1},
+  {FTKIND_GAW, -1},
+  {FTKIND_GANONDORF, 1},
+  {FTKIND_ROY, -1},
+  {FTKIND_MASTERHAND, 0},
+  {FTKIND_CRAZYHAND, 0},
+  {FTKIND_BOY, 0},
+  {FTKIND_GIRL, 0},
+  {FTKIND_GIGABOWSER, 0},
+  {FTKIND_SANDBAG, 0},
+};
+
+typedef struct CharNameSFX {
+  FighterKind kind;
+  int id;
+} CharNameSFX;
+
+static CharNameSFX NARRATOR_NAMES[33] = {
+  {FTKIND_MARIO, 0x7C830 + 21},
+  {FTKIND_FOX, 0x7C830 + 5},
+  {FTKIND_FALCON, 0x7C830},
+  {FTKIND_DK, 0x7C830 + 1},
+  {FTKIND_KIRBY, 0x7C830 + 15},
+  {FTKIND_BOWSER, 0x7C830 + 16},
+  {FTKIND_LINK, 0x7C830 + 18},
+  {FTKIND_SHEIK, 0x7C830 + 32},
+  {FTKIND_NESS, 0x7C830 + 26},
+  {FTKIND_PEACH, 0x7C830 + 27},
+  {FTKIND_POPO, 0x7C830 + 11},
+  {FTKIND_NANA, 0x7C830 + 11},
+  {FTKIND_PIKACHU, 0x7C830 + 28},
+  {FTKIND_SAMUS, 0x7C830 + 30},
+  {FTKIND_YOSHI, 0x7C830 + 31},
+  {FTKIND_JIGGLYPUFF, 0x7C830 + 13},
+  {FTKIND_MEWTWO, 0x7C830 + 24},
+  {FTKIND_LUIGI, 0x7C830 + 20},
+  {FTKIND_MARTH, 0x7C830 + 22},
+  {FTKIND_ZELDA, 0x7C830 + 33},
+  {FTKIND_YOUNGLINK, 0x7C830 + 19},
+  {FTKIND_DRMARIO, 0x7C830 + 2},
+  {FTKIND_FALCO, 0x7C830 + 4},
+  {FTKIND_PICHU, 0x7C830 + 28},
+  {FTKIND_GAW, 0x7C830 + 10},
+  {FTKIND_GANONDORF, 0x7C830 + 6},
+  {FTKIND_ROY, 0x7C830 + 12},
+  {FTKIND_MASTERHAND, 0x7C830 + 25},
+  {FTKIND_CRAZYHAND, 0},
+  {FTKIND_BOY, 0x7C830 + 3},
+  {FTKIND_GIRL, 0x7C830 + 3},
+  {FTKIND_GIGABOWSER, 0x7C830 + 8},
+  {FTKIND_SANDBAG, 0},
+};
+
+typedef struct MatchResult {
+  int test;
+} MatchResult;
+
+typedef struct MatchTeamData {
+  int test;
+} MatchTeamData;
+
+typedef struct MatchPlayerData {
+  int test;
+} MatchPlayerData;
+
+typedef struct MatchControllerPlayerUnknown {
+  int test;
+} MatchControllerPlayerUnknown;
+
+typedef struct MatchController {
+  int last_update_time;
+  MatchResult result;
+  u8 unk;
+  u8 is_teams;
+  u8 unk2;
+  int frame_count;
+  u8 unk3;
+  u8 winner_count;
+  u8 team_winner_count;
+  u8 biggest_loser;
+  u8 winners[6];
+  u8 team_winners[5];
+  u8 unk4;
+  MatchTeamData teams[5];
+  MatchPlayerData players[6];
+  u8 unk5[4];
+  MatchControllerPlayerUnknown player_unknown[4];
+  u8 unk6[2571];
+} MatchController;
 
 typedef struct PlayerCreateArgs {
     int character_id;

@@ -12,6 +12,16 @@ static HSD_Archive *gui_archive;
 static GUI_RstScreen *gui_assets;
 static RstScreen_Data *data;
 
+int getCharNameSFX(FighterKind kind) {
+    for (int i = 0; i < sizeof(NARRATOR_NAMES) / sizeof(CharNameSFX); i++) {
+        CharNameSFX sfx = NARRATOR_NAMES[i];
+        if (sfx.kind == kind) {
+            return sfx.id;
+        }
+    }
+    return 0;
+}
+
 void minor_load() {
     // int char_id = 0x0;
     // LoadCharacterDat(char_id);
@@ -46,6 +56,109 @@ void minor_load() {
     GObj_AddObject(light_gobj, 2, lobj);
     GObj_AddGXLink(light_gobj, GXLink_LObj, 0, 128);
 
+// ================== INIT ====================
+    FighterKind fighters[2] = {
+        FTKIND_JIGGLYPUFF,
+        FTKIND_SHEIK
+    };
+
+    FighterKind winnerChar = fighters[1];
+    const char* username = "username";
+
+    int victoryTheme = GetCharacterVictoryTheme(CKIND_YOUNGLINK);
+
+    int charSFX = getCharNameSFX(winnerChar);
+    GOBJ *dummy = GObj_Create(0x4, 0x5, 0x80);
+    JOBJ* jobj = (JOBJ*)(0x804d6504);
+    JOBJ_LoadJoint(jobj);
+
+    GObj_AddObject(dummy, 0x4, jobj);
+    GObj_AddGXLink(dummy, GXLink_Common, 1, 129);
+    // VictoryScreen_CreateWinnerLogo();
+    /*
+        TODO ::
+            create all necessary values from match controller struct
+
+        u8 slot = R13_U8(-0x5108);
+        GOBJ *player = Match_SetupPlayerVictoryPose(
+                            (int)(char)match->players[0].character_kind,
+                            match->players[0].field3_0x3 >> 2,
+                            slot
+                        );
+    */
+
+    // SFX_PlayRaw(charSFX, 0xFF, 0, 0, 0);
+
+    // JOBJ *logo = VictoryScreen_GetWinnerLogoJObj(logo, CKIND_BOWSER, 0);
+    // JOBJ_LoadJoint(logo);
+
+    GOBJ *winnerTextGobj = GObj_Create(0x4, 0x5, 0x80);
+    JOBJ *winnerText = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Winner]->jobj);
+
+    winnerText->trans.Y = 7.75f;
+    winnerText->trans.X = -7.5f;
+
+    winnerText->scale.X = 3.5f;
+    winnerText->scale.Y = 3.7f;
+
+    JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    JOBJ_AnimAll(winnerText);
+
+    GObj_AddObject(winnerTextGobj, 0x4, winnerText);
+    GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
+
+// ================== CHARACTER NAME ====================
+    /*GOBJ *charNameGobj = GObj_Create(0x4, 0x5, 0x80);
+    JOBJ *charName = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames]->jobj);
+
+    // Set character name
+    JOBJ_AddSetAnim(charName, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    JOBJ_ReqAnimAll(charName, (u32) (winnerChar));
+    JOBJ_AnimAll(charName);
+
+    GObj_AddObject(charNameGobj, 0x4, charName);
+    GObj_AddGXLink(charNameGobj, GXLink_Common, 1, 129);*/
+
+// ================== CHARACTER THUMBNAILS ====================
+    for (int i = 0; i < 2; i++) {
+        // Get thumbnail data
+        CharThumbnail thumbnail = THUMBNAILS[fighters[i]];
+
+        GOBJ *charThumbGobj = GObj_Create(0x4, 0x5, 0x80);
+        JOBJ *charThumb = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Thumbnails]->jobj);
+
+        charThumb->trans.Y = -13.0f;
+
+        float scale = 0.8f;
+        charThumb->scale.X = scale;
+        charThumb->scale.Y = scale;
+        switch (i) {
+            case 0:
+                // Flip thumbnail if it faces left
+                if (thumbnail.dir == -1) {
+                    charThumb->scale.X = -scale;
+                }
+                charThumb->trans.X = -1.8f;
+                break;
+            case 1:
+                // Flip thumbnail if it faces right
+                if (thumbnail.dir == 1) {
+                    charThumb->scale.X = -scale;
+                }
+                charThumb->trans.X = 1.8f;
+                break;
+        }
+
+        // Set character thumbnail
+        JOBJ_AddSetAnim(charThumb, gui_assets->jobjs[GUI_RstScreen_JOBJ_Thumbnails], 0x0);
+        JOBJ_ReqAnimAll(charThumb, (u32) thumbnail.kind);
+        JOBJ_AnimAll(charThumb);
+
+        GObj_AddObject(charThumbGobj, 0x4, charThumb);
+        GObj_AddGXLink(charThumbGobj, GXLink_Common, 1, 129);
+    }
+
+// ================== STAGE ICONS ====================
     /*
         0 - empty
         1 - ?
@@ -57,7 +170,9 @@ void minor_load() {
         7 - pokemon stadium
     */
 
-    int totalMatches = 2;
+    int matchResults[] = { 0, 1, 1 };
+    int totalMatches = 3;
+
     for (int i = 0; i < totalMatches; i++) {
         GOBJ *stageGobj = GObj_Create(0x4, 0x5, 0x80);
         GOBJ *indicatorGobj = GObj_Create(0x4, 0x5, 0x80);
@@ -73,8 +188,8 @@ void minor_load() {
             indicatorPos = (Vec2) {-5.5f, -15.5f};
         }
         else {
-            stagePos = (Vec2) {-3.0f, -18.5f};
-            indicatorPos = (Vec2) {-3.0f, -15.5f};
+            stagePos = (Vec2) {-2.7f, -18.5f};
+            indicatorPos = (Vec2) {-2.7f, -15.5f};
         }
 
         stageIcon->trans.X = stagePos.X + (i * 5.4f);
@@ -94,8 +209,9 @@ void minor_load() {
         GObj_AddGXLink(stageGobj, GXLink_Common, 1, 129);
 
         // Set win / loss
+        int result = matchResults[i];
         JOBJ_AddSetAnim(indicator, gui_assets->jobjs[GUI_RstScreen_JOBJ_GameResult], 0x0);
-        JOBJ_ReqAnimAll(indicator, (u32) (0x1));
+        JOBJ_ReqAnimAll(indicator, (u32) ((result == 0) ? 2 : 1));
         JOBJ_AnimAll(indicator);
 
         GObj_AddObject(indicatorGobj, 0x4, indicator);
@@ -146,28 +262,43 @@ void minor_load() {
 */
     GXColor white = (GXColor){255,255,255,255};
     // Create text object for rank info
-    Text *text = Text_CreateText(0, 0);
+    text = Text_CreateText(0, 0);
     text->kerning = 1;
     text->align = 0;
     text->use_aspect = 1;
     text->scale = (Vec2){0.01, 0.01};
     text->aspect.X *= 2.5;
 
-    char* debugString[20];
-    sprintf(debugString, "%0.1f", test_char->jobj->scale.X);
+    sprintf(debugString, "%x", victoryTheme);
     // sprintf(debugString, "%s", fuck->costumes[0].desc->class_name);
 
     // Create Subtext objects
-    int debugText = Text_AddSubtext(text, -1100, 0, debugString);
-    Text_SetScale(text, debugText, 5, 5);
+    // int debugText = Text_AddSubtext(text, -1400, -600, username);
+    debugText = Text_AddSubtext(text, -1400, -600, debugString);
+    Text_SetScale(text, debugText, 4.5f, 4.5f);
 
     // Set color
     Text_SetColor(text, debugText, &white);
-    // JOBJ *charact = JOBJ_LoadJoint(char_assets->jobjs[CHAR_JOBJ]->jobj);
 }
 
 void minor_think() {
+    u8 port = R13_U8(-0x5108);
+    u64 downInputs = Pad_GetDown(port);
+    u64 scrollInputs = Pad_GetRapidHeld(port);  // long delay between initial triggers, then frequent
 
+    if (scrollInputs & (HSD_BUTTON_RIGHT | HSD_BUTTON_DPAD_RIGHT)) {
+        currentSFX++;
+        SFX_PlayRaw(currentSFX, 0xFF, 0, 0, 0);
+        sprintf(debugString, "%x", currentSFX);
+        Text_SetText(text, debugText, debugString);
+    }
+
+    if (scrollInputs & (HSD_BUTTON_LEFT | HSD_BUTTON_DPAD_LEFT)) {
+        currentSFX--;
+        SFX_PlayRaw(currentSFX, 0xFF, 0, 0, 0);
+        sprintf(debugString, "%x", currentSFX);
+        Text_SetText(text, debugText, debugString);
+    }
 }
 
 void minor_exit() {
