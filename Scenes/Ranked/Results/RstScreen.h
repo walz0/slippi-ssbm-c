@@ -27,6 +27,7 @@ void* (*VictoryScreen_CreateWinnerLogo)(void) = (void *) 0x80176f60;
 
 // SFX
 int NARRATOR_WINNER_IS = 0xC355;
+int BACKGROUND_NOISE = 0x48; // Cheering
 
 int currentSFX = 0x7530;
 
@@ -38,6 +39,40 @@ typedef struct CharThumbnail {
   FighterKind kind;
   int dir;
 } CharThumbnail;
+
+typedef struct CharIdConversion {
+  CharacterKind ckind;
+  FighterKind ftkind;
+} CharIdConversion;
+
+static CharIdConversion CONVERT_ID[26] = {
+  {CKIND_FALCON, 0},
+  {CKIND_DK, 3},
+  {CKIND_FOX, 1},
+  {CKIND_GAW, 24},
+  {CKIND_KIRBY, 4},
+  {CKIND_BOWSER, 5},
+  {CKIND_LINK, 6},
+  {CKIND_LUIGI, 17},
+  {CKIND_MARIO, 0},
+  {CKIND_MARTH, 18},
+  {CKIND_MEWTWO, 16},
+  {CKIND_NESS, 8},
+  {CKIND_PEACH, 9},
+  {CKIND_PIKACHU, 12},
+  {CKIND_ICECLIMBERS, 10},
+  {CKIND_JIGGLYPUFF, 15},
+  {CKIND_SAMUS, 13},
+  {CKIND_YOSHI, 14},
+  {CKIND_ZELDA, 19},
+  {CKIND_SHEIK, 7},
+  {CKIND_FALCO, 22},
+  {CKIND_YOUNGLINK, 20},
+  {CKIND_DRMARIO, 21},
+  {CKIND_ROY, 26},
+  {CKIND_PICHU, 23},
+  {CKIND_GANONDORF, 25},
+};
 
 static CharThumbnail THUMBNAILS[33] = {
   {CKIND_FALCON, -1},
@@ -178,16 +213,23 @@ typedef struct CostumeModelInfo {
 } CostumeModelInfo;
 
 typedef struct CharacterModelInfo {
-  CostumeModelInfo **costumes;
+  CostumeModelInfo** costumes;
   u8 costume_count;
   u8 unk1;
   u8 unk2;
   u8 unk3
 } CharacterModelInfo;
 
+CharacterModelInfo* (MODEL_INFO) = 0x803c0ec0;
+
+int TOTAL_CHARACTERS = 26;
+
 GOBJ* (*Player_Create)(PlayerCreateArgs args) = 0x80068e98;
-JOBJDesc* (*LoadCharacterJObjDesc)(int character_id, int costume) = 0x80068e98;
+CharacterKind (*LoadCharacterJObjDesc)(CharacterKind kind, int costume) = (int *) 0x80085820;
 void* (*LoadCharacterDat)(int character_id) = 0x8008572c;
+void* (*LoadPlCo)(void) = 0x80067abc;
+void* (*SoundTest_PlaySFX)(int SFX) = 0x80023b24;
+
 // void* (*Player_GXProc)(int character_id) = 0x8008572c;
 
 typedef struct FtCostume {

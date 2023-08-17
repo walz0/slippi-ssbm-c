@@ -17,6 +17,10 @@ int getCharNameSFX(CharacterKind kind) {
     return sfx.id;
 }
 
+int getFighterKind(CharacterKind kind) {
+    return CONVERT_ID[kind].ftkind;
+}
+
 void minor_load() {
     // int char_id = 0x0;
     // LoadCharacterDat(char_id);
@@ -53,8 +57,8 @@ void minor_load() {
 
 // ================== INIT ====================
     CharacterKind fighters[2] = {
-        CKIND_JIGGLYPUFF,
-        CKIND_SHEIK
+        CKIND_FOX,
+        CKIND_SHEIK 
     };
 
     CharacterKind winnerChar = fighters[1];
@@ -62,13 +66,6 @@ void minor_load() {
 
     int victoryTheme = GetCharacterVictoryTheme(winnerChar);
 
-    // GOBJ *dummy = GObj_Create(0x4, 0x5, 0x80);
-    // JOBJ* jobj = (JOBJ*)(0x804d6504);
-    // JOBJ_LoadJoint(jobj);
-
-    // GObj_AddObject(dummy, 0x4, jobj);
-    // GObj_AddGXLink(dummy, GXLink_Common, 1, 129);
-    // VictoryScreen_CreateWinnerLogo();
     /*
         TODO ::
             create all necessary values from match controller struct
@@ -82,25 +79,32 @@ void minor_load() {
     */
 
     int charSFX = getCharNameSFX(winnerChar);
-    SFX_PlayRaw(charSFX, 0xFF, 0, 0, 0);
+    SFX_PlayRaw(charSFX, 0xFF, 127, 0, 0);
 
-    // JOBJ *logo = VictoryScreen_GetWinnerLogoJObj(logo, CKIND_BOWSER, 0);
-    // JOBJ_LoadJoint(logo);
+    // Use the sound test menu function to play this sound (not sure why)
+    // SoundTest_PlaySFX(NARRATOR_WINNER_IS);
+    // SFX_PlayRaw(NARRATOR_WINNER_IS,-2,-0x80,0,7);
 
     GOBJ *winnerTextGobj = GObj_Create(0x4, 0x5, 0x80);
-    JOBJ *winnerText = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Winner]->jobj);
 
-    winnerText->trans.Y = 7.75f;
-    winnerText->trans.X = -7.5f;
+    // Load PLCo
+    LoadPlCo();
 
-    winnerText->scale.X = 3.5f;
-    winnerText->scale.Y = 3.7f;
+    // JOBJ *winnerText = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Winner]->jobj);
+    // JOBJ *winnerText = JOBJ_LoadJoint(cubeModel);
 
-    JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
-    JOBJ_AnimAll(winnerText);
+    // winnerText->trans.Y = 7.75f;
+    // winnerText->trans.X = -7.5f;
 
-    GObj_AddObject(winnerTextGobj, 0x4, winnerText);
-    GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
+    // winnerText->scale.X = 3.5f;
+    // winnerText->scale.Y = 3.7f;
+
+    // JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    // // JOBJ_AddSetAnim(winnerText, &cubeModel, 0x0);
+    // JOBJ_AnimAll(winnerText);
+
+    // GObj_AddObject(winnerTextGobj, 0x4, winnerText);
+    // GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
 
 // ================== CHARACTER NAME ====================
     /*GOBJ *charNameGobj = GObj_Create(0x4, 0x5, 0x80);
@@ -213,45 +217,23 @@ void minor_load() {
         GObj_AddGXLink(indicatorGobj, GXLink_Common, 1, 129);
     }
 
-    // HSD_Archive *test_char = Archive_LoadFile("PlMt.dat");
-    // ftData *char_assets = Archive_GetPublicAddress(test_char, "ftDataMewtwo");
+// ================== STAGE ICONS ====================
+    FighterKind char_id = getFighterKind(winnerChar);
+    // Put character model in memory
+    LoadCharacterJObjDesc(char_id, 0);
+    JOBJDesc *test_char = &(MODEL_INFO[char_id].costumes[0]->desc);
+    JOBJ *test_char_jobj = JOBJ_LoadJoint(test_char);
 
-    // GOBJ *mtgobj= GObj_Create(0x4, 0x5, 0x80);
-    // GOBJ *mtgobj= GObj_Create(0x8, 0x4, 0x0);
-    // HSD_Archive *test_char = Archive_LoadFile("PlMrNr.dat");
-    // JOBJSet *test_char = (JOBJSet *) Archive_LoadFile("PlMrNr.dat");
-    // JOBJSet *char_assets = Archive_GetPublicAddress(test_char, "");
+    test_char_jobj->trans.Y = -5.0f;
+    // JOBJ *test_char_jobj = JOBJ_LoadJoint(cfalc_joint);
 
-    // LoadCharacterDat(FTKIND_MEWTWO);
+    // JOBJ_AddSetAnim(test_char_jobj, gui_assets->jobjs[GUI_RstScreen_JOBJ_GameResult], 0x0);
+    JOBJ_ReqAnimAll(test_char_jobj, (u32) 0);
+    JOBJ_AnimAll(test_char_jobj);
 
-    // u8 char_id = FTKIND_BOWSER;
-    // u8 offset = (char_id * 0x8);
-    // CharacterModelInfo *fuck = (CharacterModelInfo *) 0x803c0ec0 + offset;
-    // CharacterModelInfo *fuck = (CharacterModelInfo *) 0x803c0f40;
-    // JOBJ_LoadJoint(fuck->costumes[0]->desc->child);
-    // JOBJ_LoadJoint(test_char->jobj);
-    
-    // JOBJ_LoadSet(0, fuck->costumes[0].desc, 0, 0, 3, 1, 1, GObj_Anim);
-    // JOBJ_LoadSet(0, test_char, 0, 0, 3, 1, 1, GObj_Anim);
-
-    // GObj_AddObject(mtgobj, 0x4, test_char->jobj);
-    // GObj_AddGXLink(mtgobj, GXLink_Common, 1, 129);
-
-
-    // JOBJSet *char_assets = Archive_GetPublicAddress(test_char, "");
-
-    // char_assets->scale = (Vec3) {1.0f, 1.0f, 1.0f};
-
-    /*char_assets->trans.X = 0.0f;
-    char_assets->trans.Y = 0.0f;
-
-    JOBJ_LoadJoint(char_assets);
-    // JOBJ_SetMtxDirtySub(instance);
-    // JOBJ_LoadSet(0, char_assets->jobj, 0, 0, 3, 1, 1, GObj_Anim);
-
-    GObj_AddObject(mtgobj, 0x4, char_assets);
-    GObj_AddGXLink(mtgobj, GXLink_Common, 1, 129);*/
-    // GOBJ *char_gobj = JOBJ_LoadSet(0, char_assets->costume_jobjdesc, 0, 0, 3, 1, 1, GObj_Anim);
+    GOBJ *charGobj = GObj_Create(0x4, 0x5, 0x80);
+    GObj_AddObject(charGobj, *objkind_jobj, test_char_jobj);
+    GObj_AddGXLink(charGobj, GXLink_Common, 1, 129);
 /*
 
 */
@@ -264,7 +246,9 @@ void minor_load() {
     text->scale = (Vec2){0.01, 0.01};
     text->aspect.X *= 2.5;
 
-    sprintf(debugString, "%x", getCharNameSFX(CKIND_SHEIK));
+
+    // sprintf(debugString, "%x", &MODEL_INFO[0].costumes[0]->desc);
+    sprintf(debugString, "%d", getFighterKind(winnerChar));
     // sprintf(debugString, "%s", fuck->costumes[0].desc->class_name);
 
     // Create Subtext objects
