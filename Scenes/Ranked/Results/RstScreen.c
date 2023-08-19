@@ -57,14 +57,73 @@ void minor_load() {
 
 // ================== INIT ====================
     CharacterKind fighters[2] = {
-        CKIND_FOX,
+        CKIND_LUIGI,
         CKIND_SHEIK 
     };
 
-    CharacterKind winnerChar = fighters[1];
+    CharacterKind winnerChar = fighters[0];
     const char* username = "username";
 
+    u8 port = R13_U8(-0x5108);
+    // Pad_Rumble(port, 3, 0x20, 0);
+
     int victoryTheme = GetCharacterVictoryTheme(winnerChar);
+    charSFX = getCharNameSFX(winnerChar);
+    // Play "This game's winner is..."
+    framesLeft = FRAMES_WINNER_IS;
+    SoundTest_PlaySFX(NARRATOR_WINNER_IS);
+
+    // Normally this loops over all 4 slots
+    // GOBJ* playergobj = Match_SetupPlayerVictoryPose(winnerChar,0, port);
+    // LoadCharacterDat(0);
+    // SetupPlayerSlot(0);
+
+    char *id_mem[5];
+    // evil bit hack
+    id_mem[0] = (char) getFighterKind(winnerChar);
+    id_mem[1] = 0x0;
+    id_mem[2] = 0x0;
+    id_mem[3] = 0x0;
+    id_mem[4] = 0x0;
+
+    GOBJ* playerGobj = VictoryPose_Decide((int*) id_mem);
+
+    // PlayerCreateArgs createArgs;
+
+    // GOBJ* playerGobj = GObj_Create(0x4, 0x8, 0);
+    // GObj_AddGXLink(playerGobj, GXLink_Fighter, 5, 0);
+    // HSD_ObjAllocData playerAlloc;
+    // FighterData *player = (FighterData *)HSD_ObjAlloc(&playerAlloc);
+    // GObj_AddUserData(playerGobj, 0x4, Player_Free, player);
+
+    // LoadCharacterDat(winnerChar);
+
+    // createArgs.character_id = winnerChar;
+    // createArgs.slot = *(byte *)(winnerChar + 1);
+    // createArgs.flags2 = (*(byte *)(winnerChar + 3) & 0x40) << 1 | createArgs.flags2 & ~127;
+    // Player_InitializeFromInfo((GOBJ *) playerGobj, &createArgs);
+
+    // player->common_state_num = 0xe;
+    // player->ftstates_common = COMMON_ACTION_STATES;
+    // player->ftstates_special = CHAR_ACTION_STATES[player->kind];
+    // player->ftaction = *(SubactionInfo **)&player->ftData->x14;
+    // player->pointer_to_next_linked_list = *(AnimationInfo **)&player->ftData->x18;
+
+    // uint *CharacterEffectTableIndices = (uint *) 0x803c26fc;
+    // Player_LoadEffects(CharacterEffectTableIndices[player->kind]);
+
+    // LoadCharacterJObjDesc(player->kind, player->costume_id);
+
+    // int unk1c = 0xd;
+    // int unk18[4] = { 0xd, 0, 0, 0 };
+
+    // StartMeleeData* data;
+    // InitializeStartMeleeData(data);
+    // Match_Init(data);
+
+
+    // Load character effects;
+    // LoadEffects(0);
 
     /*
         TODO ::
@@ -78,33 +137,31 @@ void minor_load() {
                         );
     */
 
-    int charSFX = getCharNameSFX(winnerChar);
-    SFX_PlayRaw(charSFX, 0xFF, 127, 0, 0);
 
     // Use the sound test menu function to play this sound (not sure why)
-    // SoundTest_PlaySFX(NARRATOR_WINNER_IS);
     // SFX_PlayRaw(NARRATOR_WINNER_IS,-2,-0x80,0,7);
+
+
+    // Load PLCo
+    // LoadPlCo();
 
     GOBJ *winnerTextGobj = GObj_Create(0x4, 0x5, 0x80);
 
-    // Load PLCo
-    LoadPlCo();
+    JOBJ *winnerText = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Winner]->jobj);
+    // JOBJ *winnerText = JOBJ_LoadJoint(&cubeModel);
 
-    // JOBJ *winnerText = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_Winner]->jobj);
-    // JOBJ *winnerText = JOBJ_LoadJoint(cubeModel);
+    winnerText->trans.Y = 7.75f;
+    winnerText->trans.X = -7.5f;
 
-    // winnerText->trans.Y = 7.75f;
-    // winnerText->trans.X = -7.5f;
+    winnerText->scale.X = 3.5f;
+    winnerText->scale.Y = 3.7f;
 
-    // winnerText->scale.X = 3.5f;
-    // winnerText->scale.Y = 3.7f;
+    JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    // JOBJ_AddSetAnim(winnerText, &cubeModel, 0x0);
+    JOBJ_AnimAll(winnerText);
 
-    // JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
-    // // JOBJ_AddSetAnim(winnerText, &cubeModel, 0x0);
-    // JOBJ_AnimAll(winnerText);
-
-    // GObj_AddObject(winnerTextGobj, 0x4, winnerText);
-    // GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
+    GObj_AddObject(winnerTextGobj, 0x4, winnerText);
+    GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
 
 // ================== CHARACTER NAME ====================
     /*GOBJ *charNameGobj = GObj_Create(0x4, 0x5, 0x80);
@@ -217,23 +274,25 @@ void minor_load() {
         GObj_AddGXLink(indicatorGobj, GXLink_Common, 1, 129);
     }
 
-// ================== STAGE ICONS ====================
-    FighterKind char_id = getFighterKind(winnerChar);
-    // Put character model in memory
-    LoadCharacterJObjDesc(char_id, 0);
-    JOBJDesc *test_char = &(MODEL_INFO[char_id].costumes[0]->desc);
-    JOBJ *test_char_jobj = JOBJ_LoadJoint(test_char);
+// ================== CHARACTER MODEL ====================
+    // FighterKind char_id = getFighterKind(winnerChar);
+    // int costume_id = 0;
+    // // Put character model in memory
+    // LoadCharacterJObjDesc(char_id, costume_id);
+    // JOBJDesc *charDesc = &(MODEL_INFO[char_id].costumes[costume_id]->desc);
+    // JOBJ *charJobj = JOBJ_LoadJoint(charDesc);
 
-    test_char_jobj->trans.Y = -5.0f;
-    // JOBJ *test_char_jobj = JOBJ_LoadJoint(cfalc_joint);
+    // charJobj->trans.X = 2.0f;
+    // charJobj->trans.Y = -6.0f;
 
-    // JOBJ_AddSetAnim(test_char_jobj, gui_assets->jobjs[GUI_RstScreen_JOBJ_GameResult], 0x0);
-    JOBJ_ReqAnimAll(test_char_jobj, (u32) 0);
-    JOBJ_AnimAll(test_char_jobj);
+    // JOBJ_ReqAnimAll(charJobj, (u32) 0);
+    // JOBJ_AnimAll(charJobj);
 
-    GOBJ *charGobj = GObj_Create(0x4, 0x5, 0x80);
-    GObj_AddObject(charGobj, *objkind_jobj, test_char_jobj);
-    GObj_AddGXLink(charGobj, GXLink_Common, 1, 129);
+    // GOBJ *charGobj = GObj_Create(0x4, 0x5, 0x80);
+    // GObj_AddObject(charGobj, *objkind_jobj, charJobj);
+    // GObj_AddGXLink(charGobj, GXLink_Common, 1, 129);
+
+    // VictoryScreen_CreateWinnerLogo();
 /*
 
 */
@@ -248,7 +307,7 @@ void minor_load() {
 
 
     // sprintf(debugString, "%x", &MODEL_INFO[0].costumes[0]->desc);
-    sprintf(debugString, "%d", getFighterKind(winnerChar));
+    // sprintf(debugString, "%x", CharacterEffectTableIndices[player->kind]);
     // sprintf(debugString, "%s", fuck->costumes[0].desc->class_name);
 
     // Create Subtext objects
@@ -258,9 +317,19 @@ void minor_load() {
 
     // Set color
     Text_SetColor(text, debugText, &white);
+
 }
 
 void minor_think() {
+    if (framesLeft == 1) {
+        SFX_PlayRaw(charSFX, 0xFF, 127, 0, 0);
+    }
+    if (framesLeft > 0) {
+        // framesLeft--;
+    }
+    // sprintf(debugString, "%d", framesLeft);
+    // Text_SetText(text, debugText, debugString);
+
     /*u8 port = R13_U8(-0x5108);
     u64 downInputs = Pad_GetDown(port);
     u64 scrollInputs = Pad_GetRapidHeld(port);  // long delay between initial triggers, then frequent
