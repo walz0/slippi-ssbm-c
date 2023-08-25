@@ -10,8 +10,9 @@ rm -rf $BUILD_PATH
 
 echo "Compiling Ranked Scene..."
 
+# -i "Scenes/Ranked/GameSetup.c" "Components/CharStageBoxSelector.c" "Components/CharStageIcon.c" "Components/Button.c" "Components/FlatTexture.c" "Components/RightArrow.c" "Components/CharPickerDialog.c" "Components/StockIcon.c" "Components/GameResult.c" "Components/TurnIndicator.c" "Game/Characters.c" \
 mono $COMPILER_PATH -ff \
--i "Scenes/Ranked/GameSetup.c" "Components/CharStageBoxSelector.c" "Components/CharStageIcon.c" "Components/Button.c" "Components/FlatTexture.c" "Components/RightArrow.c" "Components/CharPickerDialog.c" "Components/StockIcon.c" "Components/GameResult.c" "Components/TurnIndicator.c" "Game/Characters.c" \
+-i "Scenes/Ranked/RstScreen.c" \
 -s mnFunction \
 -t "$TK_PATH/mnFunction.txt" \
 -l "./melee.link" \
@@ -30,5 +31,7 @@ mono $COMPILER_PATH -ff \
 -ow -c
 
 #cp "$OUTPUT_PATH/SlippiCSS.dat" "/Users/robertperalta/Dev/github/Ishiiruka/build/Binaries/Slippi Dolphin.app/Contents/Resources/Sys/GameFiles/GALE01/SlippiCSS.dat"
+
+cp 'output/GameSetup.dat' 'output/SlippiCSS.dat' '../Ishiiruka/build/Binaries/Sys/GameFiles/GALE01/'
 
 echo "Finished Building at: $(date)"
