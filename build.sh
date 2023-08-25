@@ -12,7 +12,7 @@ echo "Compiling Ranked Scene..."
 
 # -i "Scenes/Ranked/GameSetup.c" "Components/CharStageBoxSelector.c" "Components/CharStageIcon.c" "Components/Button.c" "Components/FlatTexture.c" "Components/RightArrow.c" "Components/CharPickerDialog.c" "Components/StockIcon.c" "Components/GameResult.c" "Components/TurnIndicator.c" "Game/Characters.c" \
 mono $COMPILER_PATH -ff \
--i "Scenes/Ranked/RstScreen.c" \
+-i "Scenes/Ranked/Results/RstScreen.c" \
 -s mnFunction \
 -t "$TK_PATH/mnFunction.txt" \
 -l "./melee.link" \
