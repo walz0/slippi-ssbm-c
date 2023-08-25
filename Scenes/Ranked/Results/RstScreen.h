@@ -135,6 +135,38 @@ typedef struct StartMeleeData {
   PlayerData *players;
 } StartMeleeData;
 
+typedef struct PlayerInitData {
+  u8 character_kind;
+  u8 slot_type;
+  u8 stocks;
+  u8 color;
+  u8 port;
+  u8 spawnpoint;
+  u8 spawn_direction;
+  u8 subcolor;
+  u8 handicap;
+  u8 team;
+  u8 nametag;
+  u8 x0b;
+  u8 x0c;
+  u8 x0d;
+  u8 x0e;
+  u8 cpu_level;
+  u8 x10;
+  u8 x11;
+  short x12;
+  u8 x14;
+  u8 x15;
+  u8 x16;
+  u8 x17;
+  float offense_ratio;
+  float defense_ratio;
+  u8 x20;
+  u8 x21;
+  u8 x22;
+  u8 x23;
+} PlayerInitData;
+
 int (*GetCharacterVictoryTheme)(CharacterKind kind) = (int *) 0x80160400;
 int (*SFX_PlayVolPitch)(int sfx, int volume, int pitch) = (int *) 0x800237a8;
 JOBJ* (*VictoryScreen_GetWinnerLogoJObj)(JOBJ *jobj, CharacterKind ckind, int is_quit_out) = (JOBJ *)0x80176bf0;
@@ -146,9 +178,22 @@ void* (*Player_Free)(FighterData *player) = (void *) 0x8006dabc;
 void* (*Player_InitializeFromInfo)(GOBJ *playerGobj, PlayerCreateArgs *args) = (void *) 0x80068914;
 void* (*Player_LoadEffects)(int param_1) = (void *) 0x8006737c;
 void* (*SetupPlayerSlot)(int slot) = (void *) 0x80031ad0;
+void* (*SetupPlayerClass)(void) = (void *) 0x800679b0;
+void* (*CameraInfo_Init)(int param_1) = (void *) 0x80028b9c;
+
+void* (*PlayerBlock_SetCharacterKind)(int slot, int kind) = (void *) 0x800323a0;
+void* (*PlayerBlock_SetColor)(int slot, int costume_id) = (void *) 0x80033208;
+void* (*PlayerBlock_SetPort)(int slot, int slot2) = (void *) 0x800334cc;
+void* (*PlayerBlock_SetSlotType)(int slot, int type) = (void *) 0x8003254c;
+void* (*PlayerBlock_SetSpawnDirection)(double dir, int slot) = (void *) 0x80033094;
+
+void* (*Match_SetupPlayer)(int slot, PlayerInitData *init_data) = 0x8016d8ac;
 
 void* (*Match_Init)(StartMeleeData *data) = (void *) 0x8016dcc0;
 void* (*InitializeStartMeleeData)(StartMeleeData *data) = (void *) 0x80167a64;
+void* (*LoadIfCoGet)(void) = (void *) 0x802ff1b4;
+
+void* (*VictoryScreen_SetupRenderTarget)(int slot) = (void *) 0x8017a9b4;
 
 // ActionStateInfo* (COMMON_ACTION_STATES) = 0x803c2800;
 // ActionStateInfo* (CHAR_ACTION_STATES) = 0x803c12e0;
@@ -374,8 +419,9 @@ int TOTAL_CHARACTERS = 26;
 GOBJ* (*Player_Create)(PlayerCreateArgs args) = 0x80068e98;
 CharacterKind (*LoadCharacterJObjDesc)(CharacterKind kind, int costume) = (int *) 0x80085820;
 void* (*LoadCharacterDat)(int character_id) = 0x8008572c;
-void* (*LoadPlCo)(void) = 0x80067abc;
+void* (*LoadPlCo)(void) = (void *) 0x80067abc;
 void* (*SoundTest_PlaySFX)(int SFX) = 0x80023b24;
+void* (*InitCharacterArrays)(void) = 0x800852b0;
 
 // void* (*Player_GXProc)(int character_id) = 0x8008572c;
 

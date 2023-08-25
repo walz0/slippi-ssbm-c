@@ -4,7 +4,7 @@
 @REM -t "m-ex/MexTK/mnFunction.txt" ^
 @REM -q -ow -c -l "melee.link"
 
-"m-ex/MexTK/MexTK.exe" -ff -i "Scenes/Ranked/RstScreen.c" ^
+"m-ex/MexTK/MexTK.exe" -ff -i "Scenes/Ranked/Results/RstScreen.c" ^
 -s mnFunction ^
 -o "output/GameSetup.dat" ^
 -t "m-ex/MexTK/mnFunction.txt" ^
@@ -16,5 +16,5 @@
 -t "m-ex/MexTK/mnFunction.txt" ^
 -q -ow -c -l "melee.link"
 
-@REM mv "C:\Users\walz\slippi-ssbm-c\output\GameSetup.dat" "C:\Users\walz\ishiiruka\Binary\x64\Sys\GameFiles\GALE01\GameSetup.dat"
-@REM mv "C:\Users\walz\slippi-ssbm-c\output\SlippiCSS.dat" "C:\Users\walz\ishiiruka\Binary\x64\Sys\GameFiles\GALE01\SlippiCSS.dat"
+mv "C:\Users\walz\slippi-ssbm-c\output\GameSetup.dat" "C:\Users\walz\ishiiruka\Binary\x64\Sys\GameFiles\GALE01\GameSetup.dat"
+mv "C:\Users\walz\slippi-ssbm-c\output\SlippiCSS.dat" "C:\Users\walz\ishiiruka\Binary\x64\Sys\GameFiles\GALE01\SlippiCSS.dat"

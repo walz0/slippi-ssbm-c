@@ -22,12 +22,10 @@ int getFighterKind(CharacterKind kind) {
 }
 
 void minor_load() {
-    // int char_id = 0x0;
-    // LoadCharacterDat(char_id);
-    // JOBJDesc *player_jobj = LoadCharacterJObjDesc(char_id, 0);
+
+
     // Load file
     gui_archive = Archive_LoadFile("RstScreen_gui.dat");
-    // gui_archive = Archive_LoadFile("GmTou1p.dat");
     gui_assets = Archive_GetPublicAddress(gui_archive, "ScGamTour_scene_data");
 
     GOBJ *cam_gobj = GObj_Create(2, 3, 128);
@@ -57,8 +55,8 @@ void minor_load() {
 
 // ================== INIT ====================
     CharacterKind fighters[2] = {
-        CKIND_LUIGI,
-        CKIND_SHEIK 
+        CKIND_MARIO,
+        CKIND_LINK 
     };
 
     CharacterKind winnerChar = fighters[0];
@@ -78,16 +76,45 @@ void minor_load() {
     // LoadCharacterDat(0);
     // SetupPlayerSlot(0);
 
-    char *id_mem[5];
+    // StartMeleeData* data;
+    // InitializeStartMeleeData(data);
+    // Match_Init(data);
+
+    // Load skeleton data and other common structs
+    // LoadPlCo();
+    // SetupPlayerClass();
+    // Load character data
+    // InitCharacterArrays();
+    // CameraInfo_Init(6);
+
+    // PlayerInitData *init_data;
+    // init_data->character_kind = FTKIND_MARIO;
+    // init_data->slot_type = 0x2;
+    // int slot = 0;
+    // Match_SetupPlayer(slot, init_data);
+    // int costume_id = 0;
+
+    // PlayerBlock_SetCharacterKind(slot, FTKIND_MARIO);
+    // PlayerBlock_SetColor(slot, costume_id);
+    // PlayerBlock_SetPort(slot, slot);
+    // PlayerBlock_SetSlotType(slot, 2);
+    // PlayerBlock_SetSpawnDirection(0.0, slot);
+
+    // char *id_mem[5];
     // evil bit hack
-    id_mem[0] = (char) getFighterKind(winnerChar);
-    id_mem[1] = 0x0;
-    id_mem[2] = 0x0;
-    id_mem[3] = 0x0;
-    id_mem[4] = 0x0;
+    // id_mem[0] = (char) getFighterKind(winnerChar);
+    // id_mem[1] = 0x0;
+    // id_mem[2] = 0x0;
+    // id_mem[3] = 0x0;
+    // id_mem[4] = 0x0;
 
-    GOBJ* playerGobj = VictoryPose_Decide((int*) id_mem);
+    // VictoryScreen_SetupRenderTarget(slot);
+    // GOBJ* playerGobj = VictoryPose_Decide((int*) id_mem);
+    // GOBJ* playergobj = Match_SetupPlayerVictoryPose((int) CKIND_MARIO, costume_id, slot);
 
+
+
+    // SetupPlayerSlot(0);
     // PlayerCreateArgs createArgs;
 
     // GOBJ* playerGobj = GObj_Create(0x4, 0x8, 0);
@@ -117,25 +144,11 @@ void minor_load() {
     // int unk1c = 0xd;
     // int unk18[4] = { 0xd, 0, 0, 0 };
 
-    // StartMeleeData* data;
-    // InitializeStartMeleeData(data);
-    // Match_Init(data);
+
 
 
     // Load character effects;
     // LoadEffects(0);
-
-    /*
-        TODO ::
-            create all necessary values from match controller struct
-
-        u8 slot = R13_U8(-0x5108);
-        GOBJ *player = Match_SetupPlayerVictoryPose(
-                            (int)(char)match->players[0].character_kind,
-                            match->players[0].field3_0x3 >> 2,
-                            slot
-                        );
-    */
 
 
     // Use the sound test menu function to play this sound (not sure why)
@@ -156,7 +169,7 @@ void minor_load() {
     winnerText->scale.X = 3.5f;
     winnerText->scale.Y = 3.7f;
 
-    JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    // JOBJ_AddSetAnim(winnerText, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
     // JOBJ_AddSetAnim(winnerText, &cubeModel, 0x0);
     JOBJ_AnimAll(winnerText);
 
@@ -164,16 +177,16 @@ void minor_load() {
     GObj_AddGXLink(winnerTextGobj, GXLink_Common, 1, 129);
 
 // ================== CHARACTER NAME ====================
-    /*GOBJ *charNameGobj = GObj_Create(0x4, 0x5, 0x80);
-    JOBJ *charName = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames]->jobj);
+    // GOBJ *charNameGobj = GObj_Create(0x4, 0x5, 0x80);
+    // JOBJ *charName = JOBJ_LoadJoint(gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames]->jobj);
 
-    // Set character name
-    JOBJ_AddSetAnim(charName, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
-    JOBJ_ReqAnimAll(charName, (u32) (winnerChar));
-    JOBJ_AnimAll(charName);
+    // // Set character name
+    // JOBJ_AddSetAnim(charName, gui_assets->jobjs[GUI_RstScreen_JOBJ_CharNames], 0x0);
+    // JOBJ_ReqAnimAll(charName, (u32) (winnerChar));
+    // JOBJ_AnimAll(charName);
 
-    GObj_AddObject(charNameGobj, 0x4, charName);
-    GObj_AddGXLink(charNameGobj, GXLink_Common, 1, 129);*/
+    // GObj_AddObject(charNameGobj, 0x4, charName);
+    // GObj_AddGXLink(charNameGobj, GXLink_Common, 1, 129);
 
 // ================== CHARACTER THUMBNAILS ====================
     for (int i = 0; i < 2; i++) {
@@ -215,16 +228,14 @@ void minor_load() {
     }
 
 // ================== STAGE ICONS ====================
-    /*
-        0 - empty
-        1 - ?
-        2 - battlefield
-        3 - yoshis
-        4 - dreamland
-        5 - final destination
-        6 - fod
-        7 - pokemon stadium
-    */
+        // 0 - empty
+        // 1 - ?
+        // 2 - battlefield
+        // 3 - yoshis
+        // 4 - dreamland
+        // 5 - final destination
+        // 6 - fod
+        // 7 - pokemon stadium
 
     int matchResults[] = { 0, 1, 1 };
     int totalMatches = 3;
@@ -275,27 +286,25 @@ void minor_load() {
     }
 
 // ================== CHARACTER MODEL ====================
-    // FighterKind char_id = getFighterKind(winnerChar);
-    // int costume_id = 0;
-    // // Put character model in memory
-    // LoadCharacterJObjDesc(char_id, costume_id);
-    // JOBJDesc *charDesc = &(MODEL_INFO[char_id].costumes[costume_id]->desc);
-    // JOBJ *charJobj = JOBJ_LoadJoint(charDesc);
+    FighterKind char_id = getFighterKind(winnerChar);
+    int costume_id = 0;
+    // Put character model in memory
+    LoadCharacterJObjDesc(char_id, costume_id);
+    JOBJDesc *charDesc = &(MODEL_INFO[char_id].costumes[costume_id]->desc);
+    JOBJ *charJobj = JOBJ_LoadJoint(charDesc);
 
-    // charJobj->trans.X = 2.0f;
-    // charJobj->trans.Y = -6.0f;
+    charJobj->trans.X = 2.0f;
+    charJobj->trans.Y = -6.0f;
 
-    // JOBJ_ReqAnimAll(charJobj, (u32) 0);
-    // JOBJ_AnimAll(charJobj);
+    JOBJ_ReqAnimAll(charJobj, (u32) 0);
+    JOBJ_AnimAll(charJobj);
 
-    // GOBJ *charGobj = GObj_Create(0x4, 0x5, 0x80);
-    // GObj_AddObject(charGobj, *objkind_jobj, charJobj);
-    // GObj_AddGXLink(charGobj, GXLink_Common, 1, 129);
+    GOBJ *charGobj = GObj_Create(0x4, 0x5, 0x80);
+    GObj_AddObject(charGobj, *objkind_jobj, charJobj);
+    GObj_AddGXLink(charGobj, GXLink_Common, 1, 129);
 
     // VictoryScreen_CreateWinnerLogo();
-/*
 
-*/
     GXColor white = (GXColor){255,255,255,255};
     // Create text object for rank info
     text = Text_CreateText(0, 0);
@@ -317,7 +326,6 @@ void minor_load() {
 
     // Set color
     Text_SetColor(text, debugText, &white);
-
 }
 
 void minor_think() {
@@ -330,23 +338,13 @@ void minor_think() {
     // sprintf(debugString, "%d", framesLeft);
     // Text_SetText(text, debugText, debugString);
 
-    /*u8 port = R13_U8(-0x5108);
+    u8 port = R13_U8(-0x5108);
     u64 downInputs = Pad_GetDown(port);
     u64 scrollInputs = Pad_GetRapidHeld(port);  // long delay between initial triggers, then frequent
 
-    if (scrollInputs & (HSD_BUTTON_RIGHT | HSD_BUTTON_DPAD_RIGHT)) {
-        currentSFX++;
-        SFX_PlayRaw(currentSFX, 0xFF, 0, 0, 0);
-        sprintf(debugString, "%x", currentSFX);
-        Text_SetText(text, debugText, debugString);
+    if (scrollInputs & (HSD_BUTTON_X | HSD_BUTTON_Y)) {
+        // open stats menu
     }
-
-    if (scrollInputs & (HSD_BUTTON_LEFT | HSD_BUTTON_DPAD_LEFT)) {
-        currentSFX--;
-        SFX_PlayRaw(currentSFX, 0xFF, 0, 0, 0);
-        sprintf(debugString, "%x", currentSFX);
-        Text_SetText(text, debugText, debugString);
-    }*/
 }
 
 void minor_exit() {
